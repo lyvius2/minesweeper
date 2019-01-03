@@ -1,0 +1,58 @@
+@media (min-width: 1200px){
+	.container {
+		width: 1170px;
+	}
+}
+@media (min-width: 992px){
+	.container {
+		width: 970px;
+	}
+}
+@media (min-width: 768px){
+	.container {
+		width: 750px;
+	}
+}
+.container {
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+table {
+	width: 100%;
+	max-width: 100%;
+	margin-bottom: 20px;
+}
+
+button {
+	width: 100%;
+	padding: 18px;
+	font-weight: bold;
+	cursor: pointer;
+}
+.btn-pure {
+	background-color: white;
+	color: black;
+	border: 2px solid #008CBA;
+}
+.btn-pure:hover {
+	background-color: #008CBA;
+	color: white;
+}
+.btn-clicked {
+	background-color: #008CBA;
+	color: white;
+	border: 2px solid #008CBA;
+}
+.btn-explode {
+	background-color: #F44336;
+	color: white;
+	border: 2px solid #F44336;
+}
+.btn-bomb {
+	background-color: #FF9800;
+	color: white;
+	border: 2px solid #FF9800;
+}

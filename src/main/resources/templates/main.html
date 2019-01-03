@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8"/>
+	<title>Minesweeper</title>
+	<link rel="stylesheet" href="/css/main.css"/>
+</head>
+<body>
+<div class="container">
+	<h3>지뢰 찾기</h3>
+	<table>
+		<th:block th:each="tile, tileIter : ${tiles}">
+			<tr>
+				<td th:each="num, numIter : ${tile}">
+					<button type="button" class="btn-pure" th:value="${tileIter.index} + ',' + ${numIter.index}" th:text="${num}">
+					</button>
+				</td>
+			</tr>
+		</th:block>
+	</table>
+</div>
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script>
+	/* 번호(사각형) 클릭 시 이벤트 */
+	$('button').on('click', function () {
+		var idx = bombNumbers.indexOf(Number($(this).text()))
+
+		// 클릭한 사각형이 폭탄이 아니면
+		if (idx === -1) {
+			let arr = $(this).val().split(',')
+			let xRange = getRange(Number(arr[0]))
+			let yRange = getRange(Number(arr[1]))
+			let target = getTarget(xRange, yRange)
+
+			let count = target.reduce(function (prev, curr) {
+				bombNumbers.forEach(function (item) {
+					if (curr == item) prev++
+				})
+				return prev
+			}, 0)
+
+			$(this).text(count)
+			$(this).removeClass('btn-pure').addClass('btn-clicked')
+			$(this).off('click')
+		// 클릭한 사각형이 폭탄일 경우
+		} else {
+			$(this).text('★')
+			$(this).removeClass('btn-pure').addClass('btn-explode')
+			alert('폭파!')
+			bombNumbers.splice(idx, 1)
+			bombNumbers.forEach(function (item) {
+				$('button').not('.btn-clicked').filter(function () { return Number($(this).text()) === item })
+					.text('★')
+					.removeClass('btn-pure')
+					.addClass('btn-bomb')
+			})
+			$('button').off('click')
+		}
+	})
+
+	/* 클릭한 사각형 주변의 8개 사각형 범위 좌표를 구하기 위한 함수 */
+	var getRange = function (pointer) {
+		let min = pointer - 1
+		let max = pointer + 1
+		if (min == -1) {
+			min = pointer
+			max++
+		} else if (max == tiles.length) {
+			max = pointer
+			min--
+		}
+		return [min, max]
+	}
+
+	/* 좌표값을 받아 클릭된 사각형 자신 포함 9개 번호를 배열로 반환하는 함수 */
+	var getTarget = function (xRange, yRange) {
+		let targetArray = tiles.slice(xRange[0], xRange[1] + 1)
+		targetArray = targetArray.reduce(function (prevArr, currVal) {
+			return prevArr.concat(currVal.slice(yRange[0], yRange[1] + 1))
+		}, new Array())
+		return targetArray
+	}
+
+	/* 화면에 뿌려진 사각형 번호들을 2차원 배열에 담아 tiles에 할당 */
+	var tiles = $('tr').get().reduce(function (prevArray, currValue) {
+		let array = $(currValue).find('button').get().reduce(function (prevArr, currVal) {
+			prevArr.push(Number($(currVal).text()))
+			return prevArr
+		}, new Array())
+		prevArray.push(array)
+		return prevArray
+	}, new Array())
+
+	/* 시작하자마자 폭탄으로 지정된 사각형 번호의 배열을 가져와 bombNumbers에 할당 */
+	var bombNumbers;
+	$.get('/getBombCount').then(function (data) {
+		bombNumbers = data
+	})
+
+</script>
+</body>
+</html>
